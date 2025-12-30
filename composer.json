@@ -1,0 +1,14 @@
+{
+    "name": "sessionplan/backend",
+    "description": "PHP REST-API for managing Barcamp session plans",
+    "type": "project",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sessionplan\\Backend\\": "src/"
+        }
+    },
+    "license": "MIT"
+}

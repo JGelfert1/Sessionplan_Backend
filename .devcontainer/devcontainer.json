@@ -12,7 +12,8 @@
 				"bmewburn.vscode-intelephense-client",
 				"felixbecker.php-debug",
 				"emallin.phpunit",
-				"devsense.composer-php-vscode"
+				"devsense.composer-php-vscode",
+				"ZencoderAI.zencoder"
 			],
 			"settings": {
 				"php.version": "8.2",
