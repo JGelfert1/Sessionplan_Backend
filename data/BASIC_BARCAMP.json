@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "title": "Barcamp Ruhr — Beispiel-Sessionplan A",
+    "date": "Samstag, 10. Januar 2025",
+    "location": "Kulturzentrum"
+  },
+  "rooms": [
+    "Raum A",
+    "Raum B",
+    "Raum C"
+  ],
+  "slots": [
+    {
+      "time": "09:00",
+      "full_span": false,
+      "cells": {
+        "Raum A": {
+          "title": "Opening Keynote",
+          "speaker": "Max Mustermann",
+          "tags": ["Keynote", "Eröffnung"],
+          "badge": "Plenum"
+        },
+        "Raum B": null,
+        "Raum C": null
+      }
+    },
+    {
+      "time": "10:00",
+      "full_span": false,
+      "cells": {
+        "Raum A": {
+          "title": "Agile Methoden im Startup",
+          "speaker": "Anna Schmidt",
+          "tags": ["Agile", "Startup"],
+          "badge": null
+        },
+        "Raum B": {
+          "title": "API Design Best Practices",
+          "speaker": "Bob Wagner",
+          "tags": ["API", "Backend"],
+          "badge": null
+        },
+        "Raum C": {
+          "title": "UI/UX für Mobile Apps",
+          "speaker": "Clara Müller",
+          "tags": ["Design", "Mobile"],
+          "badge": null
+        }
+      }
+    },
+    {
+      "time": "11:00",
+      "full_span": false,
+      "cells": {
+        "Raum A": {
+          "title": "Automatisierung mit CI/CD",
+          "speaker": "Daniel Lehmann",
+          "tags": ["DevOps", "Automation"],
+          "badge": null
+        },
+        "Raum B": {
+          "title": "Datenbank-Optimierung",
+          "speaker": "Eva Hoffmann",
+          "tags": ["Database", "Performance"],
+          "badge": null
+        },
+        "Raum C": {
+          "title": "Testing Strategien",
+          "speaker": "Frank König",
+          "tags": ["Testing", "Quality"],
+          "badge": null
+        }
+      }
+    },
+    {
+      "time": "12:00",
+      "full_span": true,
+      "cells": {
+        "all": {
+          "title": "Mittagspause",
+          "speaker": "",
+          "tags": [],
+          "badge": null
+        }
+      }
+    },
+    {
+      "time": "13:00",
+      "full_span": false,
+      "cells": {
+        "Raum A": {
+          "title": "Machine Learning Basics",
+          "speaker": "Greta Fischer",
+          "tags": ["AI", "ML"],
+          "badge": null
+        },
+        "Raum B": {
+          "title": "Security Best Practices",
+          "speaker": "Hank Johnson",
+          "tags": ["Security", "Safety"],
+          "badge": null
+        },
+        "Raum C": {
+          "title": "Community Building",
+          "speaker": "Iris Klein",
+          "tags": ["Community", "Networking"],
+          "badge": null
+        }
+      }
+    },
+    {
+      "time": "14:00",
+      "full_span": false,
+      "cells": {
+        "Raum A": {
+          "title": "Cloud Infrastructure",
+          "speaker": "Jack Miller",
+          "tags": ["Cloud", "DevOps"],
+          "badge": null
+        },
+        "Raum B": {
+          "title": "Microservices Architecture",
+          "speaker": "Karen Becker",
+          "tags": ["Architecture", "Microservices"],
+          "badge": null
+        },
+        "Raum C": {
+          "title": "Dokumentation schreiben",
+          "speaker": "Lena Richter",
+          "tags": ["Documentation", "Writing"],
+          "badge": null
+        }
+      }
+    }
+  ]
+}
