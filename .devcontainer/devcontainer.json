@@ -24,16 +24,12 @@
 			}
 		}
 	},
-	"postCreateCommand": "apt-get update && apt-get install -y mysql-client && composer install --no-interaction",
-	"forwardPorts": [8000, 3306],
+	"postCreateCommand": "apt-get update && composer install --no-interaction",
+	"forwardPorts": [8000],
 	"portsAttributes": {
 		"8000": {
 			"label": "Application",
 			"onAutoForward": "notify"
-		},
-		"3306": {
-			"label": "MySQL",
-			"onAutoForward": "ignore"
 		}
 	},
 	"remoteEnv": {
