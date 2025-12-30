@@ -17,8 +17,8 @@ $repository = new SessionPlanRepository(DATA_DIR);
 // Parse request
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$path = str_replace('/api/', '', $path);
-$parts = array_filter(explode('/', $path));
+$path = preg_replace('#^/api(/|$)#', '', $path);
+$parts = array_values(array_filter(explode('/', $path)));
 
 // Route handling
 try {

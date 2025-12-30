@@ -368,6 +368,13 @@
                 grid-template-columns: 1fr;
             }
         }
+        .session-card {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f39c12;
+        }
     </style>
 </head>
 <body>
@@ -479,6 +486,7 @@
                     console.log('selectPlan result:', result);
                     if (result.success) {
                         this.currentPlan = result.data;
+                        this.currentPlan.filename = filename;
                         this.isEditing = true;
                         this.renderEditor(filename);
                         this.updateActiveItem(filename);
@@ -568,14 +576,18 @@
                             ? '<p style="color: #7f8c8d; font-size: 13px;">Noch keine Slots</p>'
                             : slots.map((slot, i) => `
                                 <div class="slot-item">
-                                    <span class="slot-item-info">${this.escape(slot.time || '')} ${slot.full_span ? '(alle Räume)' : ''}</span>
-                                    <button class="btn-remove" onclick="app.removeSlot(${i})">Löschen</button>
+                                    <span class="slot-item-info">${this.escape(slot.start || '')} - ${this.escape(slot.end || '')} ${slot.full_span ? '(alle Räume)' : ''}</span>
+                                    <div>
+                                        <button class="btn-add" style="margin-top: 0; padding: 4px 12px;" onclick="app.editSessions(${i})">Sessions</button>
+                                        <button class="btn-remove" onclick="app.removeSlot(${i})">Löschen</button>
+                                    </div>
                                 </div>
                             `).join('')
                         }
                     </div>
                     <div class="input-group">
-                        <input type="time" id="newSlotTime" placeholder="HH:MM">
+                        <input type="time" id="newSlotStart" placeholder="Von HH:MM">
+                        <input type="time" id="newSlotEnd" placeholder="Bis HH:MM">
                         <button class="btn-add" onclick="app.addSlot()">Hinzufügen</button>
                     </div>
 
@@ -607,24 +619,120 @@
             },
 
             addSlot() {
-                const input = document.getElementById('newSlotTime');
-                const time = input.value.trim();
-                if (!time) {
-                    this.showAlert('Bitte geben Sie eine Uhrzeit ein', 'error');
+                const startInput = document.getElementById('newSlotStart');
+                const endInput = document.getElementById('newSlotEnd');
+                const start = startInput.value.trim();
+                const end = endInput.value.trim();
+                
+                if (!start || !end) {
+                    this.showAlert('Bitte geben Sie Start- und Endzeit ein', 'error');
                     return;
                 }
+                
                 this.currentPlan.slots.push({
-                    time: time,
+                    start: start,
+                    end: end,
                     full_span: false,
                     cells: {}
                 });
-                input.value = '';
+                
+                startInput.value = '';
+                endInput.value = '';
                 this.renderEditor(this.isEditing ? this.currentPlan.filename : '');
             },
 
             removeSlot(index) {
                 this.currentPlan.slots.splice(index, 1);
                 this.renderEditor(this.isEditing ? this.currentPlan.filename : '');
+            },
+
+            editSessions(slotIndex) {
+                const slot = this.currentPlan.slots[slotIndex];
+                const rooms = this.currentPlan.rooms;
+                
+                let html = `
+                    <div id="alerts"></div>
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">
+                        📅 Sessions bearbeiten: ${slot.start} - ${slot.end}
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="full_span" ${slot.full_span ? 'checked' : ''} onchange="app.toggleFullSpan(${slotIndex})">
+                            Gesamter Zeitraum (einzelne Session für alle Räume)
+                        </label>
+                    </div>
+
+                    <div id="sessionsList">
+                        ${slot.full_span ? this.renderSessionForm('all', slot.cells?.all, slotIndex) : rooms.map(room => this.renderSessionForm(room, slot.cells?.[room], slotIndex)).join('')}
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-save" onclick="app.saveSessions(${slotIndex})">✓ Übernehmen</button>
+                        <button class="btn-cancel" onclick="app.renderEditor(app.currentPlan.filename || '')">Zurück</button>
+                    </div>
+                `;
+                
+                document.getElementById('content').innerHTML = html;
+            },
+
+            renderSessionForm(room, session, slotIndex) {
+                session = session || { title: '', speaker: '', description: '' };
+                return `
+                    <div class="session-card">
+                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #2c3e50;">${room === 'all' ? 'Alle Räume' : 'Raum: ' + room}</h3>
+                        <div class="form-group">
+                            <label>Titel</label>
+                            <input type="text" class="session-title-input" data-room="${room}" value="${this.escape(session.title || '')}" placeholder="Session Titel">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Sessiongeber (Speaker)</label>
+                                <input type="text" class="session-speaker-input" data-room="${room}" value="${this.escape(session.speaker || '')}" placeholder="Name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Beschreibung</label>
+                            <textarea class="session-desc-input" data-room="${room}" placeholder="Kurze Beschreibung der Session">${this.escape(session.description || '')}</textarea>
+                        </div>
+                    </div>
+                `;
+            },
+
+            toggleFullSpan(slotIndex) {
+                this.currentPlan.slots[slotIndex].full_span = document.getElementById('full_span').checked;
+                this.editSessions(slotIndex);
+            },
+
+            saveSessions(slotIndex) {
+                const slot = this.currentPlan.slots[slotIndex];
+                const cells = {};
+                
+                const titles = document.querySelectorAll('.session-title-input');
+                const speakers = document.querySelectorAll('.session-speaker-input');
+                const descs = document.querySelectorAll('.session-desc-input');
+                
+                titles.forEach((el, i) => {
+                    const room = el.dataset.room;
+                    const title = el.value.trim();
+                    const speaker = speakers[i].value.trim();
+                    const description = descs[i].value.trim();
+                    
+                    if (title || speaker || description) {
+                        cells[room] = {
+                            title,
+                            speaker,
+                            description,
+                            tags: [],
+                            badge: null
+                        };
+                    } else {
+                        cells[room] = null;
+                    }
+                });
+                
+                slot.cells = cells;
+                this.renderEditor(this.currentPlan.filename || '');
             },
 
             async savePlan() {

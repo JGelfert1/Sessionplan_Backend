@@ -13,4 +13,4 @@ echo "Drücke Ctrl+C zum Stoppen"
 echo ""
 
 cd "$(dirname "$0")"
-php -S localhost:$PORT
+php -S 0.0.0.0:$PORT router.php

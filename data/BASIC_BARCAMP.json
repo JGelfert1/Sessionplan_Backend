@@ -11,11 +11,13 @@
   ],
   "slots": [
     {
-      "time": "09:00",
+      "start": "09:00",
+      "end": "10:00",
       "full_span": false,
       "cells": {
         "Raum A": {
           "title": "Opening Keynote",
+          "description": "Willkommen zum Barcamp Ruhr! Eine Einführung in den Tag.",
           "speaker": "Max Mustermann",
           "tags": ["Keynote", "Eröffnung"],
           "badge": "Plenum"
@@ -25,23 +27,27 @@
       }
     },
     {
-      "time": "10:00",
+      "start": "10:00",
+      "end": "11:00",
       "full_span": false,
       "cells": {
         "Raum A": {
           "title": "Agile Methoden im Startup",
+          "description": "Wie man agile Prozesse in kleinen Teams effizient einsetzt.",
           "speaker": "Anna Schmidt",
           "tags": ["Agile", "Startup"],
           "badge": null
         },
         "Raum B": {
           "title": "API Design Best Practices",
+          "description": "Tipps für langlebige und benutzerfreundliche APIs.",
           "speaker": "Bob Wagner",
           "tags": ["API", "Backend"],
           "badge": null
         },
         "Raum C": {
           "title": "UI/UX für Mobile Apps",
+          "description": "Design-Prinzipien für kleine Bildschirme.",
           "speaker": "Clara Müller",
           "tags": ["Design", "Mobile"],
           "badge": null
@@ -49,23 +55,27 @@
       }
     },
     {
-      "time": "11:00",
+      "start": "11:00",
+      "end": "12:00",
       "full_span": false,
       "cells": {
         "Raum A": {
           "title": "Automatisierung mit CI/CD",
+          "description": "Pipelines bauen für schnellere Deployments.",
           "speaker": "Daniel Lehmann",
           "tags": ["DevOps", "Automation"],
           "badge": null
         },
         "Raum B": {
           "title": "Datenbank-Optimierung",
+          "description": "Indexe, Queries und Performance-Tuning.",
           "speaker": "Eva Hoffmann",
           "tags": ["Database", "Performance"],
           "badge": null
         },
         "Raum C": {
           "title": "Testing Strategien",
+          "description": "Unit-Tests, Integration-Tests und E2E.",
           "speaker": "Frank König",
           "tags": ["Testing", "Quality"],
           "badge": null
@@ -73,11 +83,13 @@
       }
     },
     {
-      "time": "12:00",
+      "start": "12:00",
+      "end": "13:00",
       "full_span": true,
       "cells": {
         "all": {
           "title": "Mittagspause",
+          "description": "Gemeinsames Essen für alle Teilnehmer.",
           "speaker": "",
           "tags": [],
           "badge": null
@@ -85,23 +97,27 @@
       }
     },
     {
-      "time": "13:00",
+      "start": "13:00",
+      "end": "14:00",
       "full_span": false,
       "cells": {
         "Raum A": {
           "title": "Machine Learning Basics",
+          "description": "Einführung in neuronale Netze und Algorithmen.",
           "speaker": "Greta Fischer",
           "tags": ["AI", "ML"],
           "badge": null
         },
         "Raum B": {
           "title": "Security Best Practices",
+          "description": "Wie man Webanwendungen sicher macht.",
           "speaker": "Hank Johnson",
           "tags": ["Security", "Safety"],
           "badge": null
         },
         "Raum C": {
           "title": "Community Building",
+          "description": "Aufbau und Pflege von Open-Source-Communities.",
           "speaker": "Iris Klein",
           "tags": ["Community", "Networking"],
           "badge": null
@@ -109,23 +125,27 @@
       }
     },
     {
-      "time": "14:00",
+      "start": "14:00",
+      "end": "15:00",
       "full_span": false,
       "cells": {
         "Raum A": {
           "title": "Cloud Infrastructure",
+          "description": "Skalierbare Systeme in der AWS Cloud.",
           "speaker": "Jack Miller",
           "tags": ["Cloud", "DevOps"],
           "badge": null
         },
         "Raum B": {
           "title": "Microservices Architecture",
+          "description": "Entkoppelte Services und Event-Driven Design.",
           "speaker": "Karen Becker",
           "tags": ["Architecture", "Microservices"],
           "badge": null
         },
         "Raum C": {
           "title": "Dokumentation schreiben",
+          "description": "Warum gute Doku wichtiger ist als Code.",
           "speaker": "Lena Richter",
           "tags": ["Documentation", "Writing"],
           "badge": null
