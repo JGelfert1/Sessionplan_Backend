@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once 'config.php';
 require_once 'src/SessionPlanRepository.php';
+require_once 'src/Auth.php';
 
 $repository = new SessionPlanRepository(DATA_DIR);
 
@@ -19,6 +20,36 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = preg_replace('#^/api(/|$)#', '', $path);
 $parts = array_values(array_filter(explode('/', $path)));
+
+// Auth handling
+if (count($parts) >= 2 && $parts[0] === 'auth') {
+    if ($parts[1] === 'login' && $method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (Auth::login($data['username'] ?? '', $data['password'] ?? '')) {
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+        }
+        exit;
+    } elseif ($parts[1] === 'logout') {
+        Auth::logout();
+        echo json_encode(['success' => true]);
+        exit;
+    } elseif ($parts[1] === 'check') {
+        echo json_encode(['success' => true, 'authenticated' => Auth::isAuthenticated()]);
+        exit;
+    }
+}
+
+// Protected routes (any writing operation)
+if (in_array($method, ['POST', 'PUT', 'DELETE'])) {
+    if (!Auth::isAuthenticated()) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        exit;
+    }
+}
 
 // Route handling
 try {

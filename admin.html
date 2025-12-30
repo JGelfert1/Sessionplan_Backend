@@ -375,17 +375,79 @@
             margin-bottom: 15px;
             border-left: 4px solid #f39c12;
         }
+
+        .slot-details {
+            display: none;
+            padding: 10px;
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            margin-bottom: 10px;
+            margin-top: -8px;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-btn:hover {
+            color: #2980b9;
+        }
+
+        .slot-item {
+            margin-bottom: 0 !important;
+            border-radius: 4px 4px 0 0 !important;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>📋 Sessionplan Admin</h1>
-            <p>Verwaltung von Barcamp-Sessionplänen</p>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>📋 Sessionplan Admin</h1>
+                <p>Verwaltung von Barcamp-Sessionplänen</p>
+            </div>
+            <button id="logoutBtn" class="btn-remove" style="display: none; margin-top: 0;" onclick="app.logout()">Abmelden</button>
         </div>
     </header>
 
-    <div class="container">
+    <!-- Login Area -->
+    <div id="loginArea" class="container">
+        <div class="login-container">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">Anmelden</h2>
+            <div id="loginAlerts"></div>
+            <div class="form-group">
+                <label for="username">Benutzername</label>
+                <input type="text" id="username" value="admin">
+            </div>
+            <div class="form-group">
+                <label for="password">Passwort</label>
+                <input type="password" id="password" onkeyup="if(event.key==='Enter') app.login()">
+            </div>
+            <button class="btn-new" onclick="app.login()">Anmelden</button>
+        </div>
+    </div>
+
+    <div id="adminArea" class="container" style="display: none;">
         <div class="layout">
             <!-- Sidebar -->
             <aside class="sidebar">
@@ -422,8 +484,70 @@
 
             async init() {
                 console.log('✓ app.init() called');
-                console.log('API URL:', API_URL);
-                await this.loadPlans();
+                await this.checkAuth();
+            },
+
+            async checkAuth() {
+                try {
+                    const response = await fetch(`${API_URL}/auth/check`);
+                    const result = await response.json();
+                    if (result.authenticated) {
+                        this.updateUIVisibility(true);
+                        await this.loadPlans();
+                    } else {
+                        this.updateUIVisibility(false);
+                    }
+                } catch (error) {
+                    this.updateUIVisibility(false);
+                }
+            },
+
+            async login() {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    const response = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        this.updateUIVisibility(true);
+                        await this.loadPlans();
+                    } else {
+                        this.showLoginAlert(result.message || 'Anmeldung fehlgeschlagen', 'error');
+                    }
+                } catch (error) {
+                    this.showLoginAlert('Serverfehler: ' + error.message, 'error');
+                }
+            },
+
+            async logout() {
+                await fetch(`${API_URL}/auth/logout`);
+                this.updateUIVisibility(false);
+            },
+
+            updateUIVisibility(authenticated) {
+                document.getElementById('loginArea').style.display = authenticated ? 'none' : 'block';
+                document.getElementById('adminArea').style.display = authenticated ? 'block' : 'none';
+                document.getElementById('logoutBtn').style.display = authenticated ? 'block' : 'none';
+                if (!authenticated) {
+                    document.getElementById('content').innerHTML = '';
+                    document.getElementById('password').value = '';
+                }
+            },
+
+            showLoginAlert(message, type) {
+                const alertsEl = document.getElementById('loginAlerts');
+                const alertEl = document.createElement('div');
+                alertEl.className = `alert alert-${type}`;
+                alertEl.textContent = message;
+                alertsEl.innerHTML = '';
+                alertsEl.appendChild(alertEl);
+                setTimeout(() => alertEl.remove(), 5000);
             },
 
             async loadPlans() {
@@ -576,11 +700,17 @@
                             ? '<p style="color: #7f8c8d; font-size: 13px;">Noch keine Slots</p>'
                             : slots.map((slot, i) => `
                                 <div class="slot-item">
-                                    <span class="slot-item-info">${this.escape(slot.start || '')} - ${this.escape(slot.end || '')} ${slot.full_span ? '(alle Räume)' : ''}</span>
+                                    <div style="display: flex; align-items: center;">
+                                        <button class="toggle-btn" onclick="app.toggleSlotDetails(${i})">+</button>
+                                        <span class="slot-item-info">${this.escape(slot.start || '')} - ${this.escape(slot.end || '')} ${slot.full_span ? '(alle Räume)' : ''}</span>
+                                    </div>
                                     <div>
                                         <button class="btn-add" style="margin-top: 0; padding: 4px 12px;" onclick="app.editSessions(${i})">Sessions</button>
                                         <button class="btn-remove" onclick="app.removeSlot(${i})">Löschen</button>
                                     </div>
+                                </div>
+                                <div class="slot-details" id="slot-details-${i}">
+                                    ${this.renderSlotSessionsPreview(slot)}
                                 </div>
                             `).join('')
                         }
@@ -643,7 +773,40 @@
 
             removeSlot(index) {
                 this.currentPlan.slots.splice(index, 1);
-                this.renderEditor(this.isEditing ? this.currentPlan.filename : '');
+                this.renderEditor(this.currentPlan.filename || '');
+            },
+
+            toggleSlotDetails(index) {
+                const el = document.getElementById(`slot-details-${index}`);
+                const btn = el.previousElementSibling.querySelector('.toggle-btn');
+                if (el.style.display === 'block') {
+                    el.style.display = 'none';
+                    btn.textContent = '+';
+                } else {
+                    el.style.display = 'block';
+                    btn.textContent = '-';
+                }
+            },
+
+            renderSlotSessionsPreview(slot) {
+                if (!slot.cells || Object.keys(slot.cells).length === 0) {
+                    return '<p style="color: #7f8c8d; font-size: 12px; font-style: italic;">Keine Sessions eingetragen</p>';
+                }
+                
+                let html = '<div style="font-size: 12px;">';
+                for (const [room, session] of Object.entries(slot.cells)) {
+                    if (session && session.title) {
+                        html += `
+                            <div style="margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;">
+                                <strong style="color: #2c3e50;">${room === 'all' ? 'Alle Räume' : room}:</strong> 
+                                ${this.escape(session.title)} 
+                                ${session.speaker ? `<span style="color: #7f8c8d;">(${this.escape(session.speaker)})</span>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+                html += '</div>';
+                return html === '<div style="font-size: 12px;"></div>' ? '<p style="color: #7f8c8d; font-size: 12px; font-style: italic;">Keine Sessions eingetragen</p>' : html;
             },
 
             editSessions(slotIndex) {

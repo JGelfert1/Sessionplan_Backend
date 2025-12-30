@@ -1,12 +1,13 @@
 {
     "meta": {
-        "title": "Test Plan",
-        "date": "30.12.2025",
-        "location": "Test"
+        "title": "AGILE.RUHR Camp 2026",
+        "date": "Samstag",
+        "location": "UPH"
     },
     "rooms": [
-        "R1",
-        "R2"
+        "Raum 1",
+        "Raum 2",
+        "Raum 3"
     ],
     "slots": [
         {
@@ -14,20 +15,21 @@
             "end": "10:45",
             "full_span": false,
             "cells": {
-                "R1": {
-                    "title": "Test 1",
-                    "speaker": "Herbert",
+                "Raum 1": {
+                    "title": "GTD",
+                    "speaker": "Hermann",
                     "description": "",
                     "tags": [],
                     "badge": null
                 },
-                "R2": {
-                    "title": "Test 2",
-                    "speaker": "Karl",
-                    "description": "Beschreibung",
+                "Raum 2": {
+                    "title": "OKR",
+                    "speaker": "Andre",
+                    "description": "",
                     "tags": [],
                     "badge": null
-                }
+                },
+                "Raum 3": null
             }
         },
         {
