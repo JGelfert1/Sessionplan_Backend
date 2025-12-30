@@ -1,0 +1,42 @@
+{
+	"name": "Sessionplan Backend",
+	"image": "mcr.microsoft.com/devcontainers/php:8.2",
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bmewburn.vscode-intelephense-client",
+				"felixbecker.php-debug",
+				"emallin.phpunit",
+				"devsense.composer-php-vscode"
+			],
+			"settings": {
+				"php.version": "8.2",
+				"intelephense.licenceKey": "",
+				"[php]": {
+					"editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+					"editor.formatOnSave": true
+				}
+			}
+		}
+	},
+	"postCreateCommand": "apt-get update && apt-get install -y mysql-client && composer install --no-interaction",
+	"forwardPorts": [8000, 3306],
+	"portsAttributes": {
+		"8000": {
+			"label": "Application",
+			"onAutoForward": "notify"
+		},
+		"3306": {
+			"label": "MySQL",
+			"onAutoForward": "ignore"
+		}
+	},
+	"remoteEnv": {
+		"PHP_IDE_CONFIG": "serverName=localhost"
+	},
+	"remoteUser": "root"
+}
