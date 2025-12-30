@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Router für PHP Development Server
  * Leitet alle /api/* Anfragen zu index.php
@@ -13,4 +14,3 @@ if ($url !== '/' && file_exists(__DIR__ . $url)) {
 
 // Alles andere zu index.php
 require_once __DIR__ . '/index.php';
-?>
