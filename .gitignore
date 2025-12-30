@@ -1,0 +1,14 @@
+.git
+.DS_Store
+*.log
+.env
+.env.local
+.vscode/settings.json
+
+# PHP Dev Container / IDE
+vendor/
+.editorconfig
+
+# ACHTUNG: data/*.json NICHT ignorieren!
+# Die Sessionpläne werden von der API dort gespeichert und sollen im Git trackt werden
+# data/ Verzeichnis wird trackiert!

@@ -1,0 +1,11 @@
+{
+    "meta": {
+        "title": "Test Plan",
+        "date": "30.12.2025",
+        "location": "Test"
+    },
+    "rooms": [
+        "R1"
+    ],
+    "slots": []
+}

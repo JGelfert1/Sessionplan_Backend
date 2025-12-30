@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Simple Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        #result { border: 1px solid #ccc; padding: 10px; margin-top: 20px; white-space: pre-wrap; }
+        button { padding: 10px 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Simple API Test</h1>
+    
+    <button onclick="testAPI()">Test API</button>
+    <button onclick="testOrigin()">Show Origin</button>
+    
+    <div id="result">Results will appear here...</div>
+
+    <script>
+        function testOrigin() {
+            const result = document.getElementById('result');
+            result.innerHTML = `
+window.location.origin: ${window.location.origin}
+window.location.protocol: ${window.location.protocol}
+window.location.host: ${window.location.host}
+window.location.hostname: ${window.location.hostname}
+window.location.port: ${window.location.port}
+            `;
+        }
+
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Testing...\n';
+            
+            const apiUrl = window.location.origin ? (window.location.origin + '/api') : ('http://localhost:8000/api');
+            
+            result.innerHTML += `API URL: ${apiUrl}\n\n`;
+            
+            try {
+                result.innerHTML += 'Fetching...\n';
+                const response = await fetch(apiUrl);
+                
+                result.innerHTML += `Status: ${response.status}\n`;
+                result.innerHTML += `StatusText: ${response.statusText}\n`;
+                result.innerHTML += `Headers:\n`;
+                for (const [key, value] of response.headers) {
+                    result.innerHTML += `  ${key}: ${value}\n`;
+                }
+                
+                const data = await response.json();
+                result.innerHTML += `\nJSON Response:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                result.innerHTML += `ERROR: ${error.message}\n${error.stack}`;
+            }
+        }
+        
+        // Auto-run
+        window.addEventListener('load', () => {
+            testOrigin();
+            setTimeout(() => testAPI(), 500);
+        });
+    </script>
+</body>
+</html>

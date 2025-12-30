@@ -1,0 +1,32 @@
+@baseUrl = http://localhost:8000
+@apiUrl = http://localhost:8000/api
+
+### Test 1: Admin Page
+GET {{baseUrl}}/admin.html
+
+### Test 2: Debug Page
+GET {{baseUrl}}/debug.html
+
+### Test 3: API List Plans
+GET {{apiUrl}}/
+
+### Test 4: API Get Specific Plan
+GET {{apiUrl}}/BASIC_BARCAMP
+
+### Test 5: Create Test Plan
+POST {{apiUrl}}/
+Content-Type: application/json
+
+{
+  "filename": "REST_TEST",
+  "meta": {
+    "title": "REST API Test",
+    "date": "30.12.2025",
+    "location": "REST Test"
+  },
+  "rooms": ["REST Room"],
+  "slots": []
+}
+
+### Test 6: Check if file exists
+GET {{apiUrl}}/REST_TEST

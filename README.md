@@ -4,133 +4,200 @@ PHP REST-API für die Verwaltung von Barcamp-Sessionplänen.
 
 **Features:**
 - ✅ CRUD-Operationen für Sessionpläne
-- ✅ JSON-Speicherung im `data/`-Verzeichnis
+- ✅ JSON-Speicherung im `data/`-Verzeichnis (im Git Repository)
+- ✅ Admin-Frontend zur Verwaltung
 - ✅ Keine Datenbankabhängigkeit
 - ✅ CORS-Unterstützung
 - ✅ Eingabevalidierung & Sicherheit
 - ✅ Responsive API
 
-## Quick Start
+## 🚀 Quick Start
 
-### Mit Dev Container
+### Mit dem Start-Script (empfohlen)
 
 ```bash
-# VS Code
-# 1. Öffne den Workspace
-# 2. Klicke "Reopen in Container" oder nutze Command Palette (Ctrl+Shift+P)
-#    → "Dev Containers: Reopen in Container"
+cd /workspaces/Sessionplan_Backend
+bash start.sh
 
-# Server startet auf http://localhost:8000
+# Dann öffnen:
+# Admin: http://localhost:8000/admin.html
+# API: http://localhost:8000/api
 ```
 
-### Lokal (ohne Container)
+### Lokal ohne Script
 
 ```bash
-# Voraussetzung: PHP 8.2+
 cd /workspaces/Sessionplan_Backend
 php -S localhost:8000
 ```
 
-## API Dokumentation
+## 📍 Datenspeicherung
+
+✅ **Alle Sessionpläne werden im Repository gespeichert:**
+
+```
+data/
+├── .gitkeep                    # Ordner ist Teil des Repos
+├── BASIC_BARCAMP.json         # Beispiel-Plan (trackt von Git)
+├── MEIN_PLAN.json             # Mit Admin erstellter Plan (auto. trackt)
+└── ...weitere Pläne...
+```
+
+**Wichtig:** Die JSON-Dateien im `data/`-Verzeichnis werden vom Backend automatisch erstellt und gespeichert. Sie sind Teil des Git-Repositories und können committed werden.
+
+```bash
+# Beispiel: Neue Pläne sind im Repo sichtbar
+git status
+# On branch main
+# Untracked files:
+#   data/MEIN_NEUER_PLAN.json
+#   data/ANDERER_PLAN.json
+
+git add data/
+git commit -m "Neue Sessionpläne hinzugefügt"
+```
+
+## 🎨 Admin-Frontend
+
+Öffne **http://localhost:8000/admin.html** im Browser
+
+### Was du tun kannst:
+- **📋 Pläne auswählen** - Sidebar zeigt alle gespeicherten Pläne
+- **➕ Neue Pläne erstellen** - "Neuer Plan" Button
+- **✏️ Pläne bearbeiten** - Metadaten, Räume, Zeitslots
+- **💾 Speichern** - Auto-Speicherung im `data/` Verzeichnis
+- **🗑️ Löschen** - Plan entfernen
+
+## 🔌 API Dokumentation
 
 Siehe [API.md](API.md) für ausführliche Dokumentation.
 
-**Beispiel-Anfragen:**
+### Schnelle Beispiele
 
 ```bash
 # Alle Pläne abrufen
 curl http://localhost:8000/api/
 
-# Plan erstellen
-curl -X POST http://localhost:8000/api/ \
-  -H "Content-Type: application/json" \
-  -d '{"filename":"MEIN_PLAN","meta":{"title":"Mein Plan"},"rooms":[],"slots":[]}'
-
-# Plan abrufen
+# Plan auslesen
 curl http://localhost:8000/api/BASIC_BARCAMP
 
-# Plan aktualisieren
-curl -X PUT http://localhost:8000/api/BASIC_BARCAMP \
+# Neuen Plan erstellen
+curl -X POST http://localhost:8000/api/ \
   -H "Content-Type: application/json" \
-  -d '{"meta":{"title":"Neuer Titel"},"rooms":[],"slots":[]}'
+  -d '{
+    "filename": "KONFERENZ_2025",
+    "meta": {
+      "title": "Tech Konferenz 2025",
+      "date": "15. März 2025",
+      "location": "Berlin"
+    },
+    "rooms": ["Hauptsaal", "Workshop A", "Workshop B"],
+    "slots": []
+  }'
+
+# Plan aktualisieren
+curl -X PUT http://localhost:8000/api/KONFERENZ_2025 \
+  -H "Content-Type: application/json" \
+  -d '{"meta":{"title":"Neue Title"},"rooms":[],"slots":[]}'
 
 # Plan löschen
-curl -X DELETE http://localhost:8000/api/BASIC_BARCAMP
+curl -X DELETE http://localhost:8000/api/KONFERENZ_2025
 ```
 
-## API Tests
+## 🧪 API Tests
 
 ```bash
-# Test-Script ausführen (erfordert curl, jq)
+# Mit Test-Script
 bash test-api.sh
 
-# Oder manuell mit curl testen
-curl http://localhost:8000/api/
+# Oder manuell
+curl http://localhost:8000/api/ | jq .
 ```
 
-## Verzeichnisstruktur
+## 📁 Verzeichnisstruktur
 
 ```
 Sessionplan_Backend/
-├── index.php                 # API Entry Point
-├── config.php               # Konfiguration
+├── admin.html                  # Admin-Frontend (öffne im Browser!)
+├── index.php                   # API Entry Point
+├── config.php                  # Konfiguration
 ├── src/
-│   └── SessionPlanRepository.php  # CRUD-Logik
-├── data/                    # JSON-Dateien (auto-created)
-│   └── BASIC_BARCAMP.json   # Beispiel-Plan
+│   └── SessionPlanRepository.php    # CRUD-Logik
+├── data/                       # 📍 SESSIONPLÄNE (im Git!)
+│   ├── .gitkeep
+│   └── *.json
 ├── .devcontainer/
-│   └── devcontainer.json    # Dev Container Config
-├── API.md                   # API Dokumentation
-├── README.md                # Dieses Dokument
-└── test-api.sh             # Test-Script
+│   └── devcontainer.json       # Dev Container Setup
+├── .htaccess                   # Routing für Apache
+├── API.md                      # API-Dokumentation
+├── README.md                   # Dieses Dokument
+├── start.sh                    # Start-Script
+├── test-api.sh                 # Test-Script
+└── .gitignore
 ```
 
-## Integrierung mit Frontend
-
-Das Frontend (`JGelfert1/Sessionplan`) lädt JSON-Dateien über `fetch()`:
-
-```javascript
-const res = await fetch('data/template/BASIC_BARCAMP.json');
-const data = await res.json();
-```
-
-Das Backend kann mit folgendem Setup integriert werden:
-
-1. **Frontend-API auf Backend umleiten:**
-
-```javascript
-// Im Frontend (index.html)
-const PLANS = [
-  {name: 'Plan A', file: 'http://localhost:8000/api/BASIC_BARCAMP'}
-];
-```
-
-2. **Oder Backend-Pläne mit eigenem Server servieren:**
-
-```bash
-# Backend-Server
-php -S localhost:8000
-
-# Frontend-Server (in separatem Terminal)
-php -S localhost:8001
-
-# Frontend kann über CORS auf Backend zugreifen
-```
-
-## Sicherheitsfeatures
+## 🔒 Sicherheit
 
 - ✅ Eingabevalidierung (Dateinamen)
 - ✅ Directory-Traversal-Schutz
 - ✅ JSON-Validierung
 - ✅ Maximale Dateigröße: 5MB
 - ✅ CORS-Header
+- ✅ Sanitized HTML Output
 
-## Entwicklung
+## 🌍 Frontend-Integration
 
-Siehe [API.md](API.md) für:
-- Detaillierte API-Dokumentation
-- Datenstruktur-Spezifikation
-- Weitere Beispiele
+Das Original-Frontend (`JGelfert1/Sessionplan`) kann mit diesem Backend integriert werden:
+
+```javascript
+// Im Frontend (index.html) anpassen:
+const PLANS = [
+  {name: 'Plan A', file: 'http://localhost:8000/api/BASIC_BARCAMP'},
+  {name: 'Plan B', file: 'http://localhost:8000/api/KONFERENZ_2025'}
+];
+```
+
+## 💡 Tipps
+
+### Pläne nach Git committen
+```bash
+cd /workspaces/Sessionplan_Backend
+git add data/
+git commit -m "Neue/aktualisierte Sessionpläne"
+git push
+```
+
+### Backup erstellen
+```bash
+cp -r data/ data.backup_$(date +%Y%m%d)
+```
+
+### Alle Pläne löschen (lokal)
+```bash
+rm data/*.json  # Nur JSON-Dateien, .gitkeep bleibt
+```
+
+## 🛠️ Entwicklung
+
+### PHP Server mit Debug
+```bash
+php -S localhost:8000 -d display_errors=1
+```
+
+### VS Code REST Client testen
+Erstelle `test.http`:
+```http
+@baseUrl = http://localhost:8000/api
+
+### Get all plans
+GET {{baseUrl}}/
+
+### Create plan
+POST {{baseUrl}}/
+Content-Type: application/json
+
+{...}
+```
 
 ## Lizenz
 

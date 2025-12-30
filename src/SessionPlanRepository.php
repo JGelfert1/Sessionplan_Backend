@@ -46,7 +46,7 @@ class SessionPlanRepository
     public function getPlan($filename)
     {
         $path = $this->validateFilename($filename);
-        
+
         if (!file_exists($path)) {
             throw new Exception("Plan not found: $filename");
         }
@@ -74,6 +74,9 @@ class SessionPlanRepository
         if (file_exists($path)) {
             throw new Exception("Plan already exists: $filename");
         }
+
+        // Validate data structure
+        $this->validatePlanData($data);
 
         if (!isset($data['meta'])) {
             $data['meta'] = [];
@@ -107,6 +110,9 @@ class SessionPlanRepository
         if (!file_exists($path)) {
             throw new Exception("Plan not found: $filename");
         }
+
+        // Validate data structure
+        $this->validatePlanData($data);
 
         // Validate required fields
         if (!isset($data['meta'])) {
@@ -154,6 +160,9 @@ class SessionPlanRepository
      */
     private function savePlan($path, $data)
     {
+        // Remove filename field if present (should not be in the saved data)
+        unset($data['filename']);
+
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         if ($json === false) {
             throw new Exception("Failed to encode JSON");
@@ -191,5 +200,28 @@ class SessionPlanRepository
 
         return $this->dataDir . '/' . $filename . '.json';
     }
+
+    /**
+     * Validate plan data structure
+     */
+    private function validatePlanData($data)
+    {
+        if (!is_array($data)) {
+            throw new Exception("Plan data must be an array");
+        }
+
+        // Check if data can be JSON encoded
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if ($json === false) {
+            throw new Exception("Plan data cannot be JSON encoded: " . json_last_error_msg());
+        }
+
+        // Verify JSON can be decoded back
+        $decoded = json_decode($json, true);
+        if ($decoded === null) {
+            throw new Exception("Invalid JSON structure in plan data");
+        }
+
+        return true;
+    }
 }
-?>

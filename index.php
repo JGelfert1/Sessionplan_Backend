@@ -28,24 +28,24 @@ try {
             $plans = $repository->listPlans();
             http_response_code(200);
             echo json_encode(['success' => true, 'data' => $plans]);
+        } elseif ($method === 'POST') {
+            // Create new plan
+            $data = json_decode(file_get_contents('php://input'), true);
+            if (!$data || !isset($data['filename'])) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Invalid request: filename required']);
+                exit;
+            }
+            $plan = $repository->createPlan($data['filename'], $data);
+            http_response_code(201);
+            echo json_encode(['success' => true, 'data' => $plan]);
         } else {
             http_response_code(405);
             echo json_encode(['success' => false, 'message' => 'Method not allowed']);
         }
-    } elseif ($method === 'POST' && empty($parts[0])) {
-        // Create new plan
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!$data || !isset($data['filename'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Invalid request: filename required']);
-            exit;
-        }
-        $plan = $repository->createPlan($data['filename'], $data);
-        http_response_code(201);
-        echo json_encode(['success' => true, 'data' => $plan]);
     } elseif (count($parts) >= 1) {
         $filename = $parts[0];
-        
+
         if ($method === 'GET') {
             // Get specific plan
             $plan = $repository->getPlan($filename);
@@ -74,4 +74,3 @@ try {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
-?>

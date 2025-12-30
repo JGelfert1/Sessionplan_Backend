@@ -7,4 +7,3 @@ define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
 if (!is_dir(DATA_DIR)) {
     mkdir(DATA_DIR, 0755, true);
 }
-?>

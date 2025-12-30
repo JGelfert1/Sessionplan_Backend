@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Alle Anfragen auf index.php für /api/* weiterleiten
+    RewriteRule ^api(/.*)?$ index.php [QSA,L]
+
+    # Alle anderen Dateien/Ordner direkt servieren
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+</IfModule>

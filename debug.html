@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sessionplan API Debug</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #4ec9b0;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #252526;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #444;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        .error {
+            color: #f48771;
+        }
+        .success {
+            color: #6a9955;
+        }
+        .info {
+            color: #4ec9b0;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            background: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Sessionplan API Debug Console</h1>
+
+    <div class="section">
+        <h2>API Configuration</h2>
+        <p>API URL: <code id="apiUrl"></code></p>
+        <p>Host: <code id="hostInfo"></code></p>
+    </div>
+
+    <div class="section">
+        <h2>1. List All Plans (GET /api/)</h2>
+        <button onclick="testListPlans()">📋 Test: Get All Plans</button>
+        <pre id="listPlansResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2. Get Specific Plan (GET /api/{filename})</h2>
+        <input type="text" id="planFilename" placeholder="z.B. BASIC_BARCAMP" value="BASIC_BARCAMP">
+        <button onclick="testGetPlan()">🔍 Test: Get Plan</button>
+        <pre id="getPlanResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Create New Plan (POST /api/)</h2>
+        <input type="text" id="newPlanFilename" placeholder="Dateiname" value="DEBUG_PLAN">
+        <button onclick="testCreatePlan()">➕ Test: Create Plan</button>
+        <pre id="createPlanResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>4. Delete Plan (DELETE /api/{filename})</h2>
+        <input type="text" id="deletePlanFilename" placeholder="Dateiname" value="">
+        <button onclick="testDeletePlan()">🗑️ Test: Delete Plan</button>
+        <pre id="deletePlanResult"></pre>
+    </div>
+
+    <script>
+        const API_URL = window.location.protocol + '//' + window.location.host + '/api';
+
+        function showInfo() {
+            document.getElementById('apiUrl').textContent = API_URL;
+            document.getElementById('hostInfo').textContent = window.location.host + ' (' + window.location.protocol + ')';
+        }
+
+        function log(elementId, title, type, data) {
+            const el = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString('de-DE');
+            let html = `<span class="${type}">[${timestamp}] ${title}</span>\n\n`;
+            
+            if (typeof data === 'object') {
+                html += JSON.stringify(data, null, 2);
+            } else {
+                html += data;
+            }
+            
+            el.innerHTML = html;
+            el.className = type;
+        }
+
+        async function testListPlans() {
+            try {
+                log('listPlansResult', 'Lade alle Pläne...', 'info', 'Loading...');
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                log('listPlansResult', `✓ Success (HTTP ${response.status})`, 'success', data);
+            } catch (error) {
+                log('listPlansResult', '✗ Error', 'error', error.message);
+            }
+        }
+
+        async function testGetPlan() {
+            const filename = document.getElementById('planFilename').value;
+            try {
+                log('getPlanResult', `Lade Plan: ${filename}...`, 'info', 'Loading...');
+                const response = await fetch(`${API_URL}/${filename}`);
+                const data = await response.json();
+                log('getPlanResult', `✓ Success (HTTP ${response.status})`, 'success', data);
+            } catch (error) {
+                log('getPlanResult', '✗ Error', 'error', error.message);
+            }
+        }
+
+        async function testCreatePlan() {
+            const filename = document.getElementById('newPlanFilename').value;
+            const plan = {
+                filename: filename,
+                meta: {
+                    title: 'Debug Plan',
+                    date: new Date().toLocaleDateString('de-DE'),
+                    location: 'Debug'
+                },
+                rooms: ['Raum 1'],
+                slots: []
+            };
+
+            try {
+                log('createPlanResult', `Erstelle Plan: ${filename}...`, 'info', 'Loading...');
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(plan)
+                });
+                const data = await response.json();
+                log('createPlanResult', `✓ Success (HTTP ${response.status})`, 'success', data);
+            } catch (error) {
+                log('createPlanResult', '✗ Error', 'error', error.message);
+            }
+        }
+
+        async function testDeletePlan() {
+            const filename = document.getElementById('deletePlanFilename').value;
+            if (!filename) {
+                log('deletePlanResult', '✗ Error', 'error', 'Bitte Dateiname eingeben');
+                return;
+            }
+
+            try {
+                log('deletePlanResult', `Lösche Plan: ${filename}...`, 'info', 'Loading...');
+                const response = await fetch(`${API_URL}/${filename}`, { method: 'DELETE' });
+                const data = await response.json();
+                log('deletePlanResult', `✓ Success (HTTP ${response.status})`, 'success', data);
+            } catch (error) {
+                log('deletePlanResult', '✗ Error', 'error', error.message);
+            }
+        }
+
+        // Initialize
+        showInfo();
+        console.log('API Debug Console started');
+        console.log('API URL:', API_URL);
+    </script>
+</body>
+</html>
